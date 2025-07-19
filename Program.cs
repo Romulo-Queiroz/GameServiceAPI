@@ -1,15 +1,32 @@
+using GameServiceAPI.Configuration;
+using GameServiceAPI.Clients;
+using Microsoft.Extensions.Options;
+using GameServiceAPI.Interfaces;
+using GameServiceAPI.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// 1) Registra as opções:
+builder.Services.Configure<FreeToGameOptions>(
+    builder.Configuration.GetSection("FreeToGameApi"));
 
+// 2) Registra o client tipado e depois *configura* o HttpClient com sp:
+builder.Services
+    .AddHttpClient<IFreeToGameClient, FreeToGameClient>()
+    .ConfigureHttpClient((sp, client) =>
+    {
+        // Aqui sim 'sp' é IServiceProvider e 'client' é HttpClient
+        var opts = sp.GetRequiredService<IOptions<FreeToGameOptions>>().Value;
+        client.BaseAddress = new Uri(opts.BaseUrl);
+    });
+
+// 3) Resto do pipeline
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddScoped<GamesService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -17,9 +34,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
