@@ -49,7 +49,9 @@ namespace GameServiceAPI.Controllers
             var dto = new RecommendedGameDto
             {
                 Title = game.Title,
-                GameUrl = game.GameUrl
+                GameUrl = game.GameUrl,
+                Thumbnail = game.Thumbnail,
+                ShortDescription = game.ShortDescription
             };
             return Ok(dto);
         }

@@ -25,6 +25,11 @@ namespace GameServiceAPI.DTOs
         [JsonPropertyName("minimum_system_requirements")]
         public MinimumSystemRequirements MinimumSystemRequirements { get; set; }
             = new MinimumSystemRequirements();
+        [JsonPropertyName("thumbnail")]
+        public string Thumbnail { get; set; } = string.Empty;
+
+        [JsonPropertyName("short_description")]
+        public string ShortDescription { get; set; } = string.Empty;
 
     }
 }
