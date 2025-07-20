@@ -18,22 +18,18 @@ namespace GameServiceAPI.Services
         {
             var basics = await _api.GetGamesAsync();
 
-            // 2) Busca detalhes (em paralelo)
             var details = (await Task.WhenAll(
                 basics.Select(b => _api.GetGameDetailAsync(b.Id))
             ))
             .Where(d => d is not null)
             .Cast<GameDetail>();
 
-            // 3) Filtra por gênero, plataforma e memória
             var filtered = details
               .Where(d =>
-                // gênero
                 genres.Any(g =>
                   string.Equals(d.Genre, g, StringComparison.OrdinalIgnoreCase)
                 )
 
-                // plataforma ajustada
                 && (
                    platform.Equals("all", StringComparison.OrdinalIgnoreCase)
 
@@ -44,7 +40,6 @@ namespace GameServiceAPI.Services
                        && d.Platform.IndexOf("browser", StringComparison.OrdinalIgnoreCase) >= 0)
                 )
 
-                // memória
                 && d.MinimumSystemRequirements?.Memory is string mem
                 && TryParseMemoryGb(mem, out var req)
                 && req <= userMemoryGb
@@ -56,7 +51,6 @@ namespace GameServiceAPI.Services
             if (!filtered.Any())
                 return null;
 
-            // 4) Retorna um aleatório
             var rnd = new Random();
             return filtered[rnd.Next(filtered.Count)];
         }

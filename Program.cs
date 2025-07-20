@@ -20,21 +20,17 @@ builder.Services.AddCors(options =>
         });
 });
 
-// 1) Registra as opções:
 builder.Services.Configure<FreeToGameOptions>(
     builder.Configuration.GetSection("FreeToGameApi"));
 
-// 2) Registra o client tipado e depois *configura* o HttpClient com sp:
 builder.Services
     .AddHttpClient<IFreeToGameClient, FreeToGameClient>()
     .ConfigureHttpClient((sp, client) =>
     {
-        // Aqui sim 'sp' é IServiceProvider e 'client' é HttpClient
         var opts = sp.GetRequiredService<IOptions<FreeToGameOptions>>().Value;
         client.BaseAddress = new Uri(opts.BaseUrl);
     });
 
-// 3) Resto do pipeline
 builder.Services.AddControllers();
 builder.Services.AddScoped<GamesService>();
 builder.Services.AddEndpointsApiExplorer();
