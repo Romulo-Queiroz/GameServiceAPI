@@ -6,6 +6,20 @@ using GameServiceAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var MyAllowSpecificOrigins = "_myAllowReactApp";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+        policy =>
+        {
+            policy
+              .WithOrigins("http://localhost:5173")   
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+        });
+});
+
 // 1) Registra as opções:
 builder.Services.Configure<FreeToGameOptions>(
     builder.Configuration.GetSection("FreeToGameApi"));
@@ -34,6 +48,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
